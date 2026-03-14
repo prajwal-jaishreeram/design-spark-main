@@ -35,7 +35,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
             </button>
             <div className="flex items-center gap-2">
               <img src={logo} alt="Logo" className="h-7 w-7" />
-              <span className="text-sm font-bold tracking-wider uppercase">DesignForge</span>
+              <span className="text-sm font-bold tracking-wider uppercase">CreatorUncle</span>
             </div>
             <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center">
               <User className="h-4 w-4 text-foreground" />

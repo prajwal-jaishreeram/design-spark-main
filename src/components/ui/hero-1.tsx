@@ -81,7 +81,7 @@ const Hero1 = () => {
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          <span className="text-lg font-bold text-foreground">DesignForge</span>
+          <span className="text-lg font-bold text-foreground">CreatorUncle</span>
         </div>
         <button
           onClick={() => navigate("/signup")}
@@ -108,7 +108,7 @@ const Hero1 = () => {
 
         {/* Subtitle */}
         <p className="mb-10 max-w-xl text-lg text-muted-foreground">
-          DesignForge can create amazing websites with a few lines of prompt.
+          CreatorUncle can create amazing websites with a few lines of prompt.
         </p>
 
         {/* Attachments preview */}
@@ -165,11 +165,10 @@ const Hero1 = () => {
             />
             <button
               onClick={toggleMic}
-              className={`flex-shrink-0 transition-colors ${
-                isListening
+              className={`flex-shrink-0 transition-colors ${isListening
                   ? "text-destructive animate-pulse"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
               title={isListening ? "Stop listening" : "Voice input"}
             >
               {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}

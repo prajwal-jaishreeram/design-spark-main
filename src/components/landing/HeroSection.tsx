@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { PromptInputBox } from "@/components/ui/ai-prompt-box";
 import { Navbar } from "@/components/landing/Navbar";
+import LightRays from "@/components/ui/LightRays";
 import * as React from "react";
 
 const labels = [
@@ -25,7 +26,7 @@ export function HeroSection() {
     }
   }, [controls, isInView]);
 
-  const titleWords = ["BUILD", "STUNNING", "WEBSITES", "EFFORTLESSLY"];
+  const titleWords = ["Build", "stunning", "websites", "Effortlessly"];
 
   const handleSend = (message: string, files?: File[]) => {
     if (isAuthenticated) {
@@ -37,14 +38,35 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[85vh] md:min-h-screen flex flex-col bg-background" ref={ref}>
+    <section
+      className="relative z-0 flex min-h-[85vh] md:min-h-screen w-full flex-col overflow-hidden bg-background"
+      ref={ref}
+    >
       <Navbar />
 
+      {/* LightRays WebGL background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#ffffff"
+          raysSpeed={1}
+          lightSpread={0.5}
+          rayLength={3}
+          followMouse={true}
+          mouseInfluence={0.1}
+          noiseAmount={0}
+          distortion={0}
+          pulsating={false}
+          fadeDistance={1}
+          saturation={1}
+        />
+      </div>
+
       {/* Hero content */}
-      <div className="flex-1 flex items-center justify-center px-4 md:px-6 pt-16 md:pt-20">
+      <div className="relative z-50 flex-1 flex items-center justify-center px-4 md:px-6 pt-16 md:pt-20">
         <div className="w-full max-w-4xl text-center">
           {/* Animated title */}
-          <h1 className="mb-3 md:mb-4 flex flex-wrap justify-center gap-x-2 gap-y-0.5 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]">
+          <h1 className="mb-3 md:mb-4 flex flex-wrap justify-center gap-x-3 gap-y-1 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]">
             {titleWords.map((text, index) => (
               <motion.span
                 key={index}

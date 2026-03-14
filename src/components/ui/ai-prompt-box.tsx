@@ -182,7 +182,7 @@ interface PromptInputContextType {
   disabled?: boolean;
 }
 const PromptInputContext = React.createContext<PromptInputContextType>({
-  isLoading: false, value: "", setValue: () => {}, maxHeight: 240, onSubmit: undefined, disabled: false,
+  isLoading: false, value: "", setValue: () => { }, maxHeight: 240, onSubmit: undefined, disabled: false,
 });
 function usePromptInput() {
   return React.useContext(PromptInputContext);
@@ -210,7 +210,7 @@ const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
         <PromptInputContext.Provider value={{ isLoading, value: value ?? internalValue, setValue: onValueChange ?? handleChange, maxHeight, onSubmit, disabled }}>
           <div
             ref={ref}
-            className={cn("rounded-3xl border border-border bg-card p-2 shadow-[0_0_30px_-5px_rgba(212,175,55,0.15)] transition-all duration-300", isLoading && "border-destructive/70", className)}
+            className={cn("rounded-3xl border border-white bg-card p-2 shadow-xl transition-all duration-300", isLoading && "border-destructive/70", className)}
             onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
           >
             {children}
@@ -286,7 +286,7 @@ interface PromptInputBoxProps {
   className?: string;
 }
 export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxProps>((props, ref) => {
-  const { onSend = () => {}, isLoading = false, placeholder = "Describe the website you want to build...", className } = props;
+  const { onSend = () => { }, isLoading = false, placeholder = "Describe the website you want to build...", className } = props;
   const [input, setInput] = React.useState("");
   const [files, setFiles] = React.useState<File[]>([]);
   const [filePreviews, setFilePreviews] = React.useState<{ [key: string]: string }>({});
@@ -360,7 +360,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
     <>
       <PromptInput
         value={input} onValueChange={setInput} isLoading={isLoading} onSubmit={handleSubmit}
-        className={cn("w-full bg-card border-border shadow-2xl", isRecording && "border-destructive/70", className)}
+        className={cn("w-full bg-card border-white shadow-2xl", isRecording && "border-destructive/70", className)}
         disabled={isLoading || isRecording} ref={ref || promptBoxRef}
         onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}
       >
@@ -387,7 +387,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
         </div>
 
         {isRecording && (
-          <VoiceRecorder isRecording={isRecording} onStartRecording={() => {}} onStopRecording={(d) => { setIsRecording(false); onSend(`[Voice message - ${d} seconds]`, []); }} />
+          <VoiceRecorder isRecording={isRecording} onStartRecording={() => { }} onStopRecording={(d) => { setIsRecording(false); onSend(`[Voice message - ${d} seconds]`, []); }} />
         )}
 
         <div className="flex items-center justify-between gap-2 p-0 pt-2">
@@ -462,15 +462,15 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
             <button
               className={cn("inline-flex items-center justify-center h-8 w-8 rounded-full transition-all duration-200",
                 isRecording ? "bg-transparent hover:bg-secondary text-destructive" :
-                hasContent ? "bg-foreground hover:bg-foreground/80 text-background" :
-                "bg-transparent hover:bg-secondary text-muted-foreground")}
+                  hasContent ? "bg-foreground hover:bg-foreground/80 text-background" :
+                    "bg-transparent hover:bg-secondary text-muted-foreground")}
               onClick={() => { if (isRecording) setIsRecording(false); else if (hasContent) handleSubmit(); else setIsRecording(true); }}
               disabled={isLoading && !hasContent}
             >
               {isLoading ? <Square className="h-4 w-4 fill-current animate-pulse" /> :
-               isRecording ? <StopCircle className="h-5 w-5 text-destructive" /> :
-               hasContent ? <ArrowUp className="h-4 w-4" /> :
-               <Mic className="h-5 w-5" />}
+                isRecording ? <StopCircle className="h-5 w-5 text-destructive" /> :
+                  hasContent ? <ArrowUp className="h-4 w-4" /> :
+                    <Mic className="h-5 w-5" />}
             </button>
           </PromptInputAction>
         </div>

@@ -1,0 +1,57 @@
+﻿
+Currently stored credentials:
+
+    Target: MicrosoftAccount:target=SSO_POP_User:user=prajwalshindee@outlook.com
+    Type: Generic 
+    User: prajwalshindee@outlook.com
+    Saved for this logon only
+    
+    Target: MicrosoftAccount:target=SSO_POP_Device
+    Type: Generic 
+    User: 02zqxnketrixoigv
+    Saved for this logon only
+    
+    Target: LegacyGeneric:target=MicrosoftAccount:user=prajwalshindee@outlook.com
+    Type: Generic 
+    User: prajwalshindee@outlook.com
+    Local machine persistence
+    
+    Target: LegacyGeneric:target=Supabase CLI:supabase
+    Type: Generic 
+    User: supabase
+    Local machine persistence
+    
+    Target: LegacyGeneric:target=gh:github.com:
+    Type: Generic 
+    Local machine persistence
+    
+    Target: LegacyGeneric:target=gh:github.com:prajwal-jaishreeram
+    Type: Generic 
+    User: prajwal-jaishreeram
+    Local machine persistence
+    
+    Target: LegacyGeneric:target=git:https://github.com/prajwal-jaishreeram/design-spark-main.git
+    Type: Generic 
+    User: prajwal-jaishreeram
+    Local machine persistence
+    
+    Target: LegacyGeneric:target=git:https://github.com/prajwal-jaishreeram/brandbuilder-ai.git
+    Type: Generic 
+    User: prajwal-jaishreeram
+    Local machine persistence
+    
+    Target: LegacyGeneric:target=git:https://github.com/prajwal-jaishreeram/store-genie.git
+    Type: Generic 
+    User: prajwal-jaishreeram
+    Local machine persistence
+    
+    Target: WindowsLive:target=virtualapp/didlogical
+    Type: Generic 
+    User: 02zqxnketrixoigv
+    Local machine persistence
+    
+    Target: LegacyGeneric:target=git:https://github.com/prajwal-jaishreeram/owner-insights.git
+    Type: Generic 
+    User: prajwal-jaishreeram
+    Local machine persistence
+    

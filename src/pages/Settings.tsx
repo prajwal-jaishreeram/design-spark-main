@@ -1,11 +1,84 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Github, Check, X } from "lucide-react";
+import * as api from "@/lib/api";
 
 const Settings = () => {
+  const { user, profile, refreshProfile } = useAuth();
+  const { toast } = useToast();
+  const [displayName, setDisplayName] = useState(profile?.display_name || "");
+  const [ideogramKey, setIdeogramKey] = useState("");
+  const [claudeKey, setClaudeKey] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [savingKeys, setSavingKeys] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
+
+  const githubUsername = profile?.api_keys?.github_username;
+  const githubConnected = !!githubUsername;
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ display_name: displayName })
+      .eq("id", user.id);
+    setSaving(false);
+    if (error) {
+      toast({ title: "Failed to save", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Profile updated" });
+      await refreshProfile();
+    }
+  };
+
+  const handleSaveApiKeys = async () => {
+    if (!user) return;
+    setSavingKeys(true);
+    const keys: Record<string, string> = {};
+    if (ideogramKey) keys.ideogram = ideogramKey;
+    if (claudeKey) keys.claude = claudeKey;
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ api_keys: { ...profile?.api_keys, ...keys } })
+      .eq("id", user.id);
+    setSavingKeys(false);
+    if (error) {
+      toast({ title: "Failed to save API keys", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "API keys saved" });
+      setIdeogramKey("");
+      setClaudeKey("");
+    }
+  };
+
+  const handleConnectGitHub = () => {
+    api.connectGitHub();
+  };
+
+  const handleDisconnectGitHub = async () => {
+    if (!user) return;
+    setDisconnecting(true);
+    try {
+      await api.disconnectGitHub(user.id);
+      toast({ title: "GitHub disconnected" });
+      await refreshProfile();
+    } catch {
+      toast({ title: "Failed to disconnect", variant: "destructive" });
+    } finally {
+      setDisconnecting(false);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="p-4 md:p-8 max-w-2xl">
@@ -18,13 +91,25 @@ const Settings = () => {
               <div className="space-y-4">
                 <div>
                   <Label className="text-xs uppercase tracking-wider">Display Name</Label>
-                  <Input defaultValue="Demo User" className="mt-1.5 bg-card" />
+                  <Input
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="mt-1.5 bg-card"
+                  />
                 </div>
                 <div>
                   <Label className="text-xs uppercase tracking-wider">Email</Label>
-                  <Input defaultValue="demo@example.com" className="mt-1.5 bg-card" disabled />
+                  <Input value={user?.email || ""} className="mt-1.5 bg-card" disabled />
                 </div>
-                <Button size="sm" className="text-xs uppercase tracking-wider">Save Changes</Button>
+                <Button
+                  size="sm"
+                  className="text-xs uppercase tracking-wider"
+                  onClick={handleSaveProfile}
+                  disabled={saving}
+                >
+                  {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
+                  Save Changes
+                </Button>
               </div>
             </section>
 
@@ -36,34 +121,108 @@ const Settings = () => {
               <div className="space-y-4">
                 <div>
                   <Label className="text-xs uppercase tracking-wider">Ideogram API Key</Label>
-                  <Input placeholder="Enter your Ideogram API key" className="mt-1.5 bg-card" type="password" />
+                  <Input
+                    placeholder={profile?.api_keys?.ideogram ? "••••••••" : "Enter your Ideogram API key"}
+                    className="mt-1.5 bg-card"
+                    type="password"
+                    value={ideogramKey}
+                    onChange={(e) => setIdeogramKey(e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label className="text-xs uppercase tracking-wider">Claude API Key</Label>
-                  <Input placeholder="Enter your Claude API key" className="mt-1.5 bg-card" type="password" />
+                  <Input
+                    placeholder={profile?.api_keys?.claude ? "••••••••" : "Enter your Claude API key"}
+                    className="mt-1.5 bg-card"
+                    type="password"
+                    value={claudeKey}
+                    onChange={(e) => setClaudeKey(e.target.value)}
+                  />
                 </div>
-                <Button variant="outline" size="sm" className="text-xs uppercase tracking-wider">Save API Keys</Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs uppercase tracking-wider"
+                  onClick={handleSaveApiKeys}
+                  disabled={savingKeys || (!ideogramKey && !claudeKey)}
+                >
+                  {savingKeys ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
+                  Save API Keys
+                </Button>
               </div>
             </section>
 
             <Separator />
 
             <section>
-              <h2 className="text-sm font-semibold uppercase tracking-wider mb-2">Connected Accounts</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wider mb-2">Connectors</h2>
+              <p className="text-xs text-muted-foreground mb-4">
+                Connect external accounts to sync your projects.
+              </p>
               <div className="space-y-3">
-                <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
-                  <div className="flex items-center gap-3">
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    <span className="text-xs uppercase tracking-wider">GitHub</span>
+                {/* GitHub */}
+                <div className="rounded-lg border border-border bg-card p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+                        <Github className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium uppercase tracking-wider">GitHub</span>
+                          {githubConnected && (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-green-500/20 text-green-400 border border-green-500/30">
+                              Connected
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {githubConnected
+                            ? `@${githubUsername}`
+                            : "Connect to sync projects to GitHub repositories"}
+                        </p>
+                      </div>
+                    </div>
+                    {githubConnected ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs uppercase tracking-wider text-destructive hover:text-destructive"
+                        onClick={handleDisconnectGitHub}
+                        disabled={disconnecting}
+                      >
+                        {disconnecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Disconnect"}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs uppercase tracking-wider"
+                        onClick={handleConnectGitHub}
+                      >
+                        <Github className="h-3.5 w-3.5 mr-1.5" />
+                        Connect
+                      </Button>
+                    )}
                   </div>
-                  <Button variant="outline" size="sm" className="text-xs uppercase tracking-wider">Connect</Button>
                 </div>
-                <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
-                  <div className="flex items-center gap-3">
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 22.525H0l12-21.05 12 21.05z"/></svg>
-                    <span className="text-xs uppercase tracking-wider">Vercel</span>
+
+                {/* Vercel (placeholder) */}
+                <div className="rounded-lg border border-border bg-card p-4 opacity-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 22.525H0l12-21.05 12 21.05z" /></svg>
+                      </div>
+                      <div>
+                        <span className="text-xs font-medium uppercase tracking-wider">Vercel</span>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">Coming soon</p>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" className="text-xs uppercase tracking-wider" disabled>
+                      Connect
+                    </Button>
                   </div>
-                  <Button variant="outline" size="sm" className="text-xs uppercase tracking-wider">Connect</Button>
                 </div>
               </div>
             </section>

@@ -1,0 +1,2 @@
+﻿origin	https://github.com/prajwal-jaishreeram/design-spark-main.git (fetch)
+origin	https://github.com/prajwal-jaishreeram/design-spark-main.git (push)
